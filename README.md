@@ -280,3 +280,9 @@ docker-compose exec app ./main migrate
 ```bash
 docker-compose logs -f app
 ```
+
+---
+
+<p align="center">Developed by</p>
+<p align="center">Fikri Naufal Hamdi</p>
+<p align="center">Information System and Technology @ ITB</p>
