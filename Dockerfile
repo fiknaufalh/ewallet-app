@@ -20,8 +20,10 @@ FROM alpine:latest
 
 WORKDIR /app
 
-# Install postgresql-client for wait-for script
-RUN apk add --no-cache postgresql-client
+# Install required packages
+RUN apk add --no-cache \
+    curl \
+    postgresql-client
 
 # Copy the binary from builder
 COPY --from=builder /app/main .
@@ -29,7 +31,7 @@ COPY --from=builder /app/main .
 COPY --from=builder /app/config/. ./config/
 # Copy wait-for script
 COPY scripts/wait-for.sh /wait-for.sh
-# Make wait-for script executable
+# Make script executable
 RUN chmod +x /wait-for.sh
 
 # Expose port
