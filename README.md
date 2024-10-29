@@ -85,7 +85,7 @@ Using Docker Compose (recommended):
 docker-compose up --build
 ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:3000`.
 
 ## API Documentation and Testing Guide
 
@@ -183,14 +183,14 @@ Retrieves current wallet balance.
 ### Complete Flow Test
 1. Create a new user
 ```bash
-curl -X POST http://localhost:8080/api/v1/users \
+curl -X POST http://localhost:3000/api/v1/users \
   -H "Content-Type: application/json" \
   -d '{"username":"john_doe","email":"john@example.com"}'
 ```
 
 2. Top up the wallet (save the user_id from step 1)
 ```bash
-curl -X POST http://localhost:8080/api/v1/topup \
+curl -X POST http://localhost:3000/api/v1/topup \
   -H "Content-Type: application/json" \
   -H "X-Idempotency-Key: unique-key-123" \
   -d '{"user_id":"YOUR-USER-ID","amount":100000,"reference_id":"TOP-123456"}'
@@ -198,12 +198,12 @@ curl -X POST http://localhost:8080/api/v1/topup \
 
 3. Check balance
 ```bash
-curl http://localhost:8080/api/v1/balance/YOUR-USER-ID
+curl http://localhost:3000/api/v1/balance/YOUR-USER-ID
 ```
 
 4. Withdraw some money
 ```bash
-curl -X POST http://localhost:8080/api/v1/withdraw \
+curl -X POST http://localhost:3000/api/v1/withdraw \
   -H "Content-Type: application/json" \
   -H "X-Idempotency-Key: unique-key-456" \
   -d '{"user_id":"YOUR-USER-ID","amount":50000,"reference_id":"WD-123456","bank_account":"1234567890"}'
@@ -211,20 +211,20 @@ curl -X POST http://localhost:8080/api/v1/withdraw \
 
 5. Check balance again
 ```bash
-curl http://localhost:8080/api/v1/balance/YOUR-USER-ID
+curl http://localhost:3000/api/v1/balance/YOUR-USER-ID
 ```
 
 ### Testing Idempotency
 Try sending the same top-up request twice with the same idempotency key:
 ```bash
 # First request - should succeed
-curl -X POST http://localhost:8080/api/v1/topup \
+curl -X POST http://localhost:3000/api/v1/topup \
   -H "Content-Type: application/json" \
   -H "X-Idempotency-Key: test-key-1" \
   -d '{"user_id":"YOUR-USER-ID","amount":100000,"reference_id":"TOP-789"}'
 
 # Second request with same key - should return the same response without processing again
-curl -X POST http://localhost:8080/api/v1/topup \
+curl -X POST http://localhost:3000/api/v1/topup \
   -H "Content-Type: application/json" \
   -H "X-Idempotency-Key: test-key-1" \
   -d '{"user_id":"YOUR-USER-ID","amount":100000,"reference_id":"TOP-789"}'
