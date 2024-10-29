@@ -1,23 +1,39 @@
-# Use the official Golang image as a parent image
-FROM golang:1.20-alpine
+# Build stage
+FROM golang:1.21-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Go module files
-COPY go.mod go.sum ./
+# Copy go mod and sum files
+COPY go.mod ./
 
-# Download the Go module dependencies
+# Download dependencies
 RUN go mod download
 
-# Copy the source code into the container
+# Copy source code
 COPY . .
 
-# Build the Go app
-RUN go build -o main ./cmd
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/api
 
-# Expose port 8080 to the outside world
+# Final stage
+FROM alpine:latest
+
+WORKDIR /app
+
+# Install postgresql-client for wait-for script
+RUN apk add --no-cache postgresql-client
+
+# Copy the binary from builder
+COPY --from=builder /app/main .
+# Copy config directory
+COPY --from=builder /app/config/. ./config/
+# Copy wait-for script
+COPY scripts/wait-for.sh /wait-for.sh
+# Make wait-for script executable
+RUN chmod +x /wait-for.sh
+
+# Expose port
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["./main"]
+# Use wait-for script as entrypoint
+ENTRYPOINT ["/wait-for.sh", "db", "./main"]
